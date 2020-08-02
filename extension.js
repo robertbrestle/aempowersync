@@ -22,8 +22,7 @@ function activate(context) {
 	context.subscriptions.push(vscode.commands.registerCommand('aempowersync.syncFromAEM', (uri) => {
 		isAEMRunning(function(isUp) {
 			if(isUp) {
-				console.log('server is up!');
-				//callAEMSync(aemsyncscriptpath, 'get', uri, aemserver, aemcreds);
+				callAEMSync(aemsyncscriptpath, 'get', uri, aemserver, aemcreds);
 			}else {
 				vscode.window.showErrorMessage('Local AEM instance not running. Please start AEM and try again.');
 			}
@@ -32,8 +31,7 @@ function activate(context) {
 	context.subscriptions.push(vscode.commands.registerCommand('aempowersync.syncToAEM', (uri) => {
 		isAEMRunning(function(isUp) {
 			if(isUp) {
-				console.log('server is up!');
-				//callAEMSync(aemsyncscriptpath, 'put', uri, aemserver, aemcreds);
+				callAEMSync(aemsyncscriptpath, 'put', uri, aemserver, aemcreds);
 			}else {
 				vscode.window.showErrorMessage('Local AEM instance not running. Please start AEM and try again.');
 			}
@@ -101,28 +99,17 @@ function isAEMRunning(callback) {
 		path: vscode.workspace.getConfiguration('aempowersync').get('healthcheck'),
 		timeout: 5000
 	};
-	console.log(JSON.stringify(options));
 	var aemreq = http.request(options, (res) => {
-		psoutput.appendLine('Healthcheck: ' + res.statusCode);
-		if(res.statusCode <= 500) {
+		// for consistency with handling a null healthcheck, moved logic to event.close
+	}).on('close', () => {
+		if(aemreq.res != null && aemreq.res.statusCode != null) {
+			psoutput.appendLine('Healthcheck: ' + aemreq.res.statusCode);
 			callback(true);
 		}else {
+			psoutput.appendLine('Healthcheck: null');
 			callback(false);
 		}
-	}).on('timeout', (err) => {
-		psoutput.appendLine('Healthcheck Timeout: ' + host + ':' + port);
-		psoutput.appendLine(err);
-		callback(false);
-	}).on('error', (err) => {
-		psoutput.appendLine('Healthcheck Error: ' + host + ':' + port);
-		psoutput.appendLine(err);
-		callback(false);
 	}).end();
-	// null response
-	if(aemreq.res == null) {
-		psoutput.appendLine('Healthcheck: null response');
-		callback(false);
-	}
 }
 
 module.exports = {

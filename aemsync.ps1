@@ -5,8 +5,10 @@
 # Requires PATH variable for 7z
 
 # localhost:4502/system/console/configMgr
-#   Apache Sling Referrer Filter => Enable allow empty, Remove POST
-#   Adobe Granite CSRF Filter => remove POST
+#  Apache Sling Referrer Filter => Enable allow empty, Remove POST
+#    http://localhost:4502/system/console/configMgr/org.apache.sling.security.impl.ReferrerFilter
+#  Adobe Granite CSRF Filter => remove POST
+#    http://localhost:4502/system/console/configMgr/com.adobe.granite.csrf.impl.CSRFFilter
 param(
 	[Parameter(Mandatory=$True)]
 	[String] $ACTION,

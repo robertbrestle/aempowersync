@@ -9,9 +9,10 @@ Sync options at the bottom of the Explorer window context menu:
 
 **Please, only use this extension for local AEM development.**
 
-## Requirements
+## Setup Configuration
+Please follow all configuration steps before attempting to execute the script.  
 
-### Software
+### Software Dependencies
 - [7z](https://www.7-zip.org/a/7z1900-x64.msi)
 - [PowerShell 6+](https://github.com/PowerShell/PowerShell/releases)
 
@@ -29,6 +30,8 @@ Get `7z` to work from your command line
 - Open a new **cmd terminal** and enter `7z`
     - if the command is recognized, you should see a list of commands
     - you're **done!**
+  
+[More information here](https://support.microsoft.com/en-us/help/310519/how-to-manage-environment-variables-in-windows-xp)
  
 ### Set PowerShell 6/7 as default shell in VSCode
 - File > Preferences > Settings
@@ -53,9 +56,21 @@ WSManStackVersion              3.0
 ```
 
 ### AEM localhost configuration
-localhost:4502/system/console/configMgr
-- **Apache Sling Referrer Filter** => Enable allow empty, Remove POST
-- **Adobe Granite CSRF Filter** => remove POST
+For the script to access the AEM APIs, you must update the following configurations.  
+In [configMgr](http://localhost:4502/system/console/configMgr)  
+- [Apache Sling Referrer Filter](http://localhost:4502/system/console/configMgr/org.apache.sling.security.impl.ReferrerFilter) => Enable allow empty, Remove POST
+- [Adobe Granite CSRF Filter](http://localhost:4502/system/console/configMgr/com.adobe.granite.csrf.impl.CSRFFilter) => remove POST
+
+**If you do not update these configurations, the script will delete folders/files from your filesystem**
+
+### Unblock PowerShell Script
+This extension uses a PowerShell script to manage AEM packages and code on your filesystem.  
+The script is located at:  
+`%USERPROFILE%\.vscode\extensions\aempoiwersync-X.X.X\aemsync.ps1`
+
+Per MS, I encourage you to read the contents of the script before unblocking the file or changing your execution policy.  
+[You can read more here](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-7#example-7--unblock-a-script-to-run-it-without-changing-the-execution-policy)  
+
 
 ## Extension Settings
 - aempowersync.uri
@@ -68,3 +83,4 @@ localhost:4502/system/console/configMgr
 
 ## Known Issues
 - Syncing `.content.xml` files does not work; you must sync the parent folder
+- `Sync to AEM` will break if attempting to sync a file/folder whose parent folder doesn't exist
