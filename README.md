@@ -10,7 +10,7 @@ Sync options at the bottom of the Explorer window context menu:
 **Please, only use this extension for local AEM development.**
 
 ## Setup Configuration
-Please follow all configuration steps before attempting to execute the script.  
+Please follow all configuration steps before attempting to use this extension.  
 
 ### Software Dependencies
 - [7z](https://www.7-zip.org/a/7z1900-x64.msi)
@@ -31,7 +31,7 @@ Get `7z` to work from your command line
     - if the command is recognized, you should see a list of commands
     - you're **done!**
   
-[More information here](https://support.microsoft.com/en-us/help/310519/how-to-manage-environment-variables-in-windows-xp)
+[More information on environment variables here.](https://support.microsoft.com/en-us/help/310519/how-to-manage-environment-variables-in-windows-xp)
  
 ### Set PowerShell 6/7 as default shell in VSCode
 - File > Preferences > Settings
@@ -40,7 +40,7 @@ Get `7z` to work from your command line
 - Set **terminal.integrated.shell.windows** to `C:\\Program Files\\PowerShell\\6\\pwsh.exe`
 - Save file
 - Reload VSCode ( CTRL + SHIFT + P > **Developer: Reload Window**)
-- Upon reload, open terminal and verify the PS version: `$PSVersionTable`
+- Upon reload, open the terminal and verify the PS version: `$PSVersionTable`
 ```
 Name                           Value
 ----                           -----
@@ -55,6 +55,8 @@ SerializationVersion           1.1.0.1
 WSManStackVersion              3.0
 ```
 
+**This script also works with PowerShell 7**
+
 ### AEM localhost configuration
 For the script to access the AEM APIs, you must update the following configurations.  
 In [configMgr](http://localhost:4502/system/console/configMgr)  
@@ -66,21 +68,26 @@ In [configMgr](http://localhost:4502/system/console/configMgr)
 ### Unblock PowerShell Script
 This extension uses a PowerShell script to manage AEM packages and code on your filesystem.  
 The script is located at:  
-`%USERPROFILE%\.vscode\extensions\aempoiwersync-X.X.X\aemsync.ps1`
+`%USERPROFILE%\.vscode\extensions\aempowersync-X.X.X\aemsync.ps1`
 
-Per MS, I encourage you to read the contents of the script before unblocking the file or changing your execution policy.  
+Per Microsoft, I encourage you to read the contents of the script before unblocking the file or changing your execution policy.  
 [You can read more here](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-7#example-7--unblock-a-script-to-run-it-without-changing-the-execution-policy)  
 
 
 ## Extension Settings
 - aempowersync.uri
     - AEM server uri as `https?://HOSTNAME:PORT`
+    - default = `http://127.0.0.1:4502`
 - aempowersync.credentials
     - AEM admin user credentials as `USERNAME:PASSWORD`
+    - default = `admin:admin`
 - aempowersync.healthcheck
     - AEM healthcheck endpoint as url path
-    - by default, this points to CRXDE `/crx/de/index.jsp`
+    - default = `/crx/de/index.jsp`
 
 ## Known Issues
-- Syncing `.content.xml` files does not work; you must sync the parent folder
-- `Sync to AEM` will break if attempting to sync a file/folder whose parent folder doesn't exist
+- Syncing `.content.xml` files **to AEM** does not work; you must sync the parent folder
+    - `.content.xml` from AEM = enabled
+    - `.content.xml` to AEM = disabled
+    - `_cq_editConfig.xml` from/to AEM = disabled
+    - `_cq_template/` from/to AEM = disabled

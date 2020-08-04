@@ -1,5 +1,6 @@
 const vscode = require('vscode');
 const http = require('http');
+const { url } = require('inspector');
 
 var syncing = false;
 var psoutput;
@@ -62,6 +63,18 @@ function callAEMSync(scriptpath, action, uri, aemserver, aemcreds) {
 	}
 
 	var niceUri = uri.toString().replace(/^.*jcr_root/,'');
+	var syncfile = niceUri.split('/').pop();
+
+	// cannot send files/folders that start with '.' or '_' to AEM instance
+	if(action === 'put' && (syncfile[0] === '.' || syncfile[0] === '_')) {
+		vscode.window.showErrorMessage('Cannot sync metadata files to the instance. Please sync the parent directory.');
+		return;
+	}
+	if(action === 'get' && syncfile[0] === '_') {
+		vscode.window.showErrorMessage('Cannot sync metadata files from the instance. Please sync the parent directory.');
+		return;
+	}
+
 	vscode.window.showInformationMessage('aemsync started: ' + action + ' - ' + niceUri);
 	syncing = true;
 

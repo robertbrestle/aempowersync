@@ -3,7 +3,7 @@
 	"displayName": "AEM PowerSync",
 	"description": "Sync files and folders between your local AEM instance and file system.",
 	"publisher": "RobertBrestle",
-	"version": "0.1.4",
+	"version": "0.1.5",
 	"preview": true,
 	"repository": {
 		"url": "https://github.com/robertbrestle/aempowersync.git",
@@ -38,7 +38,7 @@
 				"aempowersync.credentials": {
 					"type": "string",
 					"default": "admin:admin",
-					"description": "AEM admin username : AEM admin password"
+					"description": "<AEM admin username>:<AEM admin password>"
 				},
 				"aempowersync.healthcheck": {
 					"type": "string",

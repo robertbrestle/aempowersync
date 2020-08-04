@@ -57,7 +57,7 @@ if((Get-Item $INPUTFILE) -is [System.IO.DirectoryInfo]) {
 
 #############################################################################
 
-function create_base_package($filterpath) {
+function create_base_package() {
 	# delete old package artifacts
 	if(Test-Path jcr_root) {
 		Remove-Item -Force -Recurse jcr_root
@@ -70,7 +70,7 @@ function create_base_package($filterpath) {
 	New-Item -F $TMPPKGFOLDER/META-INF/vault -ItemType "directory" | Out-Null
 	New-Item -F $TMPPKGFOLDER/jcr_root -ItemType "directory" | Out-Null
 	
-	$FILTER = "<?xml version=""1.0"" encoding=""UTF-8""?><workspaceFilter version=""1.0""><filter root=""", $filterpath, """/></workspaceFilter>" -Join ""
+	$FILTER = "<?xml version=""1.0"" encoding=""UTF-8""?><workspaceFilter version=""1.0""><filter root=""", $AEMFILE, """/></workspaceFilter>" -Join ""
 	
 	$PROPERTIES = "<?xml version=""1.0"" encoding=""UTF-8"" standalone=""no""?><!DOCTYPE properties SYSTEM ""http://java.sun.com/dtd/properties.dtd""><properties><entry key=""name"">aempowersync</entry><entry key=""version"">1.0.0</entry><entry key=""group"">aempowersync</entry></properties>"
 	
@@ -95,13 +95,18 @@ function unzip_package() {
 	Remove-Item -Force $TMPPKG
 }
 
+# copy from package to your working folder
 function copy_here() {
 	$COPYITEM=($TMPPKGFOLDER,"/jcr_root",$AEMFILE -Join "")
 	if($TYPE -eq "folder") {
-		Remove-Item -Force -Recurse $INPUTFILE
 		if(Test-Path $COPYITEM) {
+			# remove local folder
+			Remove-Item -Force -Recurse $INPUTFILE
 			#$COPYITEM=($COPYITEM,"/*" -Join "")
 			Copy-Item $COPYITEM -Destination $INPUTFILE -Force -Recurse
+		}else {
+			echo "Missing content folder from package!"
+			echo $INPUTFILE
 		}
 	}else {
 		if(Test-Path $COPYITEM) {
@@ -114,16 +119,46 @@ function copy_here() {
 	Remove-Item -Force -Recurse $TMPPKGFOLDER
 }
 
+# copy from your working folder to temporary content package
 function copy_local() {
-	$COPYITEM=($TMPPKGFOLDER,"/jcr_root",$AEMFILE -Join "")
-	echo $COPYITEM
-	if($TYPE -eq "folder") {
-		#$INPUTFILE=($INPUTFILE,"/*" -Join "")
-		Remove-Item -Force -Recurse $COPYITEM
-		Copy-Item $INPUTFILE -Destination $COPYITEM -Force -Recurse
-	}else {
-		Copy-Item $INPUTFILE -Destination $COPYITEM -Force
+	# split path folders
+	$PATHARR=($AEMFILE -Split "/")
+	# remove last element
+	$PATHARR=$PATHARR[1..($PATHARR.length -2)]
+	# BASEPATH = working directory
+	$BASEPATH=($INPUTFILE -replace $AEMFILE, "")
+	# COPYPATH = temporary package
+	$COPYPATH=($TMPPKGFOLDER,"/jcr_root" -Join "")
+
+	# construct parent folders of sync directory
+	foreach($p in $PATHARR) {
+		if($p) {
+			# create new folder within package contents
+			New-Item -Path "$COPYPATH/$p" -ItemType "directory" | Out-Null
+			# check for folder metadata. if found, copy to package contents
+			if(Test-Path -Path "$BASEPATH/.content.xml") {
+				Copy-Item "$BASEPATH/.content.xml" -Destination "$COPYPATH/"
+			}
+			$COPYPATH="$COPYPATH/$p"
+			$BASEPATH="$BASEPATH/$p"
+		}
 	}
+	# copy last content.xml to folder
+	if(Test-Path -Path "$BASEPATH/.content.xml") {
+		Copy-Item "$BASEPATH/.content.xml" -Destination "$COPYPATH/"
+	}
+
+	# copy file/folder to package
+	if($TYPE -eq "folder") {
+		Copy-Item $INPUTFILE -Destination "$COPYPATH/" -Force -Recurse
+	}else {
+		Copy-Item $INPUTFILE -Destination "$COPYPATH/" -Force
+	}
+}
+
+function cleanup_packages() {
+	Remove-Item -Force -Recurse $TMPPKGFOLDER
+	Remove-Item -Force $TMPPKG
 }
 
 #####################################################################
@@ -136,12 +171,6 @@ function upload_pkg() {
 		'file'= Get-Item -Path $TMPPKG
 	}
 	Invoke-RestMethod -Method post -Headers $AEMHeaders -Uri $AEMURL -Form $Fields | Out-Null
-	
-	#Start-Job -Name WebReq -ScriptBlock { 
-	#	Invoke-RestMethod -Method post -Headers $AEMHeaders -Uri $AEMURL -Form $Fields
-	#} | Out-Null
-	#Wait-Job -Name WebReq | Out-Null
-	#Remove-Job WebReq
 }
 
 function install_pkg() {
@@ -177,7 +206,7 @@ switch($ACTION)
 {
 	"get" {
 		echo ("GET ",$AEMFILE -Join "")
-		create_base_package $AEMFILE
+		create_base_package
 		zip_package
 		upload_pkg
 		build_pkg
@@ -188,17 +217,12 @@ switch($ACTION)
 	"put" {
 		echo ("PUT ",$AEMFILE -Join "")
 		# copy fresh structure from AEM instance
-		create_base_package $AEMFILE
-		zip_package
-		upload_pkg
-		build_pkg
-		download_pkg
-		unzip_package
-		# copy working directory into existing server structure
+		create_base_package
 		copy_local
 		zip_package
 		upload_pkg
 		install_pkg
+		#cleanup_packages
 	}
 	default {
 		echo "invalid action"
