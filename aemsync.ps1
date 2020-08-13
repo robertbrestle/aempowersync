@@ -157,8 +157,12 @@ function copy_local() {
 }
 
 function cleanup_packages() {
-	Remove-Item -Force -Recurse $TMPPKGFOLDER
-	Remove-Item -Force $TMPPKG
+	if(Test-Path -PathType "container" $TMPPKGFOLDER) {
+		Remove-Item -Force -Recurse $TMPPKGFOLDER
+	}
+	if(Test-Path -PathType "any" $TMPPKG) {
+		Remove-Item -Force $TMPPKG
+	}
 }
 
 #####################################################################
@@ -171,6 +175,10 @@ function upload_pkg() {
 		'file'= Get-Item -Path $TMPPKG
 	}
 	Invoke-RestMethod -Method post -Headers $AEMHeaders -Uri $AEMURL -Form $Fields | Out-Null
+	# delete package
+	if(Test-Path -PathType "any" $TMPPKG) {
+		Remove-Item -Force $TMPPKG
+	}
 }
 
 function install_pkg() {
@@ -197,10 +205,16 @@ function delete_pkg() {
 function download_pkg() {
 	$AEMURL=$AEMSERVER,$AEMPACKAGES,"aempowersync/aempowersync-1.0.0.zip" -Join ""
 	Invoke-RestMethod -Headers $AEMHeaders -Uri $AEMURL -OutFile $TMPPKG
-	# TODO: verify file was downloaded
+	# verify file was downloaded
+	if(!Test-Path -PathType "any" $TMPPKG) {
+		echo "Error: package not downloaded. Aborting."
+		exit
+	}
 }
 
 #####################################################################
+
+cleanup_packages
 
 switch($ACTION)
 {
@@ -222,7 +236,6 @@ switch($ACTION)
 		zip_package
 		upload_pkg
 		install_pkg
-		#cleanup_packages
 	}
 	default {
 		echo "invalid action"

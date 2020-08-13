@@ -5,6 +5,13 @@ All notable changes to the "aempowersync" extension will be documented in this f
 
 ## [Unreleased]
 
+## [0.1.6] - 2020-08-12
+### Added
+- verify GET package was downloaded
+- bubble up error messages as popup notifications
+### Changed
+- updated `cleanup_packages` to test before deleting old packages from the filesystem
+
 ## [0.1.5] - 2020-08-04
 ### Added
 - check + error messages for trying to sync metadata/dialog files and folders

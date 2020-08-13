@@ -77,6 +77,7 @@ function callAEMSync(scriptpath, action, uri, aemserver, aemcreds) {
 
 	vscode.window.showInformationMessage('aemsync started: ' + action + ' - ' + niceUri);
 	syncing = true;
+	var hasError = false;
 
 	// run ps script
 	var spawn = require('child_process').spawn,child;
@@ -88,14 +89,26 @@ function callAEMSync(scriptpath, action, uri, aemserver, aemcreds) {
 		aemcreds
 	]);
 	child.stdout.on('data',function(data){
-		psoutput.appendLine('' + data);
+		var message = (data.toString()).trim();
+		psoutput.appendLine(message);
+		if(message.indexOf('Error:') == 0) {
+			vscode.window.showErrorMessage(message);
+			hasError = true;
+		}
 	});
 	child.stderr.on('data',function(data){
-		psoutput.appendLine('Error: ' + data);
+		var message = (data.toString()).trim();
+		psoutput.appendLine('Error: ' + message);
+		vscode.window.showErrorMessage('An error occurred. Please see the AEM PowerSync output window.');
+		hasError = true;
 	});
 	child.on('exit',function(){
-		psoutput.appendLine('aemsync completed');
-		vscode.window.showInformationMessage('aemsync completed: ' + action + ' - ' + niceUri);
+		if(hasError) {
+			psoutput.appendLine('aemsync encountered an error');
+		}else {
+			psoutput.appendLine('aemsync completed');
+			vscode.window.showInformationMessage('aemsync completed: ' + action + ' - ' + niceUri);
+		}
 		syncing = false;
 	});
 	child.stdin.end();
