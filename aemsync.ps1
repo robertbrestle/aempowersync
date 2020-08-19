@@ -28,8 +28,8 @@ if($INPUTFILE -eq "undefined") {
 
 # DO NOT RUN THIS AGAINST HIGHER ENVIRONMENTS !!
 #$AEMSERVER="http://localhost:4502"
-# DO NOT RUN THIS AGAINST HIGHER ENVIRONMENTS !!
 #$AEMCREDS="admin:admin"
+# DO NOT RUN THIS AGAINST HIGHER ENVIRONMENTS !!
 $AEMPACKMGR="/crx/packmgr/service/.json"
 $AEMPACKMGRUPLOAD="/crx/packmgr/service.jsp"
 $AEMPACKAGES="/etc/packages/"
@@ -206,7 +206,7 @@ function download_pkg() {
 	$AEMURL=$AEMSERVER,$AEMPACKAGES,"aempowersync/aempowersync-1.0.0.zip" -Join ""
 	Invoke-RestMethod -Headers $AEMHeaders -Uri $AEMURL -OutFile $TMPPKG
 	# verify file was downloaded
-	if(!Test-Path -PathType "any" $TMPPKG) {
+	if(!(Test-Path -PathType "any" $TMPPKG)) {
 		echo "Error: package not downloaded. Aborting."
 		exit
 	}

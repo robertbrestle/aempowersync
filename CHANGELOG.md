@@ -5,6 +5,10 @@ All notable changes to the "aempowersync" extension will be documented in this f
 
 ## [Unreleased]
 
+## [0.1.7] - 2020-08-18
+### Fixed
+- updated downloaded package file test syntax
+
 ## [0.1.6] - 2020-08-12
 ### Added
 - verify GET package was downloaded
