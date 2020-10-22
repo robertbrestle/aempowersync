@@ -3,7 +3,7 @@
 	"displayName": "AEM PowerSync",
 	"description": "Sync files and folders between your local AEM instance and file system.",
 	"publisher": "RobertBrestle",
-	"version": "0.1.7",
+	"version": "0.1.8",
 	"preview": true,
 	"repository": {
 		"url": "https://github.com/robertbrestle/aempowersync.git",
@@ -30,6 +30,11 @@
 			"type": "object",
 			"title": "AEM PowerSync Configuration",
 			"properties": {
+				"aempowersync.powershell": {
+					"type": "string",
+					"default": "C:\\Program Files\\PowerShell\\6\\pwsh.exe",
+					"description": "PowerShell executable location"
+				},
 				"aempowersync.uri": {
 					"type": "string",
 					"default": "http://127.0.0.1:4502",
@@ -76,10 +81,10 @@
 		"test": "node ./test/runTest.js"
 	},
 	"devDependencies": {
-		"@types/vscode": "^1.47.0",
 		"@types/glob": "^7.1.1",
 		"@types/mocha": "^7.0.2",
 		"@types/node": "^13.11.0",
+		"@types/vscode": "^1.47.0",
 		"eslint": "^6.8.0",
 		"glob": "^7.1.6",
 		"mocha": "^7.1.2",

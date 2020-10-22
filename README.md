@@ -20,10 +20,10 @@ Please follow all configuration steps before attempting to use this extension.
 Get `7z` to work from your command line
 - Install 7z from the link above
 - Edit environment variables:
-    - press the **Windows Key**
-    - search **Edit the system environment variables**
-    - click **Environment Variables..**
-    - under **System variables** select **Path** and click **Edit..**
+    - press **Windows Key** + **R**
+    - enter `SystemPropertiesAdvanced`
+    - click **Environment Variables...**
+    - under **System variables** select **Path** and click **Edit...**
     - click **New** and enter the path to your 7z binaries
         - `c:\Program Files\7-Zip\`
 - Click **OK** for all the open dialogues
@@ -32,30 +32,6 @@ Get `7z` to work from your command line
     - you're **done!**
   
 [More information on environment variables here.](https://support.microsoft.com/en-us/help/310519/how-to-manage-environment-variables-in-windows-xp)
- 
-### Set PowerShell 6/7 as default shell in VSCode
-- File > Preferences > Settings
-- Search for **terminal.integrated.shell.windows**
-- Click **Edit in settings.json**
-- Set **terminal.integrated.shell.windows** to `C:\\Program Files\\PowerShell\\6\\pwsh.exe`
-- Save file
-- Reload VSCode ( CTRL + SHIFT + P > **Developer: Reload Window**)
-- Upon reload, open the terminal and verify the PS version: `$PSVersionTable`
-```
-Name                           Value
-----                           -----
-PSVersion                      6.2.7
-PSEdition                      Core
-GitCommitId                    6.2.7
-OS                             Microsoft Windows 10.0.XXXXX
-Platform                       Win32NT
-PSCompatibleVersions           {1.0, 2.0, 3.0, 4.0…}
-PSRemotingProtocolVersion      2.3
-SerializationVersion           1.1.0.1
-WSManStackVersion              3.0
-```
-
-**This script also works with PowerShell 7**
 
 ### AEM localhost configuration
 For the script to access the AEM APIs, you must update the following configurations.  
@@ -65,7 +41,7 @@ In [configMgr](http://localhost:4502/system/console/configMgr)
 
 **If you do not update these configurations, the script will delete folders/files from your filesystem**
 
-### Unblock PowerShell Script
+### Unblock PowerShell Script [Conditional]
 This extension uses a PowerShell script to manage AEM packages and code on your filesystem.  
 The script is located at:  
 `%USERPROFILE%\.vscode\extensions\aempowersync-X.X.X\aemsync.ps1`
@@ -75,6 +51,9 @@ Per Microsoft, I encourage you to read the contents of the script before unblock
 
 
 ## Extension Settings
+- aempowersync.powershell
+    - Location of the PowerShell executable
+    - default = `C:\\Program Files\\PowerShell\\6\\pwsh.exe`
 - aempowersync.uri
     - AEM server uri as `https?://HOSTNAME:PORT`
     - default = `http://127.0.0.1:4502`

@@ -13,6 +13,8 @@ function activate(context) {
 	// reference script from extensions folder
 	var aemsyncscriptpath = context.extensionPath + '\\aemsync.ps1';
 
+	// config
+	var powershellexe = vscode.workspace.getConfiguration('aempowersync').get('powershell');
 	var aemserver = vscode.workspace.getConfiguration('aempowersync').get('uri');
 	var aemcreds = vscode.workspace.getConfiguration('aempowersync').get('credentials');
 
@@ -23,7 +25,7 @@ function activate(context) {
 	context.subscriptions.push(vscode.commands.registerCommand('aempowersync.syncFromAEM', (uri) => {
 		isAEMRunning(function(isUp) {
 			if(isUp) {
-				callAEMSync(aemsyncscriptpath, 'get', uri, aemserver, aemcreds);
+				callAEMSync(powershellexe, aemsyncscriptpath, 'get', uri, aemserver, aemcreds);
 			}else {
 				vscode.window.showErrorMessage('Local AEM instance not running. Please start AEM and try again.');
 			}
@@ -32,7 +34,7 @@ function activate(context) {
 	context.subscriptions.push(vscode.commands.registerCommand('aempowersync.syncToAEM', (uri) => {
 		isAEMRunning(function(isUp) {
 			if(isUp) {
-				callAEMSync(aemsyncscriptpath, 'put', uri, aemserver, aemcreds);
+				callAEMSync(powershellexe, aemsyncscriptpath, 'put', uri, aemserver, aemcreds);
 			}else {
 				vscode.window.showErrorMessage('Local AEM instance not running. Please start AEM and try again.');
 			}
@@ -42,7 +44,7 @@ function activate(context) {
 exports.activate = activate;
 function deactivate() {}
 
-function callAEMSync(scriptpath, action, uri, aemserver, aemcreds) {
+function callAEMSync(powershellexe, scriptpath, action, uri, aemserver, aemcreds) {
 	if(syncing) {
 		vscode.window.showInformationMessage('Please wait for the current sync to complete before starting a new one.');
 		return;
@@ -81,7 +83,7 @@ function callAEMSync(scriptpath, action, uri, aemserver, aemcreds) {
 
 	// run ps script
 	var spawn = require('child_process').spawn,child;
-	child = spawn('pwsh.exe', [
+	child = spawn(powershellexe, [
 		scriptpath,
 		action,
 		uri,

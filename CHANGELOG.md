@@ -5,6 +5,12 @@ All notable changes to the "aempowersync" extension will be documented in this f
 
 ## [Unreleased]
 
+## [0.1.8] - 2020-10-22
+### Added
+- extension configuration for PowerShell executable: `aempowersync.powershell`
+### Changed
+- removed PATH dependency for PowerShell in README
+
 ## [0.1.7] - 2020-08-18
 ### Fixed
 - updated downloaded package file test syntax
