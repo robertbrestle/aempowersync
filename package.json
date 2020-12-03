@@ -3,7 +3,7 @@
 	"displayName": "AEM PowerSync",
 	"description": "Sync files and folders between your local AEM instance and file system.",
 	"publisher": "RobertBrestle",
-	"version": "0.1.8",
+	"version": "0.1.9",
 	"preview": true,
 	"repository": {
 		"url": "https://github.com/robertbrestle/aempowersync.git",
@@ -12,7 +12,8 @@
 	"keywords": [
 		"adobe experience manager",
 		"aem",
-		"sync"
+		"sync",
+		"development"
 	],
 	"engines": {
 		"vscode": "^1.47.0"
@@ -32,7 +33,7 @@
 			"properties": {
 				"aempowersync.powershell": {
 					"type": "string",
-					"default": "C:\\Program Files\\PowerShell\\6\\pwsh.exe",
+					"default": "C:\\\\Program Files\\\\PowerShell\\\\6\\\\pwsh.exe",
 					"description": "PowerShell executable location"
 				},
 				"aempowersync.uri": {
@@ -47,7 +48,7 @@
 				},
 				"aempowersync.healthcheck": {
 					"type": "string",
-					"default": "/crx/de/index.jsp",
+					"default": "/libs/granite/core/content/login.html",
 					"description": "AEM healthcheck path"
 				}
 			}

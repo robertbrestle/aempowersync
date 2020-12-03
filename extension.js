@@ -27,7 +27,7 @@ function activate(context) {
 			if(isUp) {
 				callAEMSync(powershellexe, aemsyncscriptpath, 'get', uri, aemserver, aemcreds);
 			}else {
-				vscode.window.showErrorMessage('Local AEM instance not running. Please start AEM and try again.');
+				vscode.window.showErrorMessage('AEM healthcheck failed. Please check your AEM instance and extension configuration settings.');
 			}
 		});
 	}));
@@ -36,7 +36,7 @@ function activate(context) {
 			if(isUp) {
 				callAEMSync(powershellexe, aemsyncscriptpath, 'put', uri, aemserver, aemcreds);
 			}else {
-				vscode.window.showErrorMessage('Local AEM instance not running. Please start AEM and try again.');
+				vscode.window.showErrorMessage('AEM healthcheck failed. Please check your AEM instance and extension configuration settings.');
 			}
 		});
 	}));
@@ -58,9 +58,9 @@ function callAEMSync(powershellexe, scriptpath, action, uri, aemserver, aemcreds
 		vscode.window.showErrorMessage('Invalid sync path. Please ensure the jcr_root folder is open.');
 		return;
 	}
-	// skip syncing jcr_root and /apps
-	if(uri.toString().match('apps[\\|/]?$') || uri.toString().match('jcr_root[\\|/]?$')) {
-		vscode.window.showErrorMessage('Invalid sync path - ' + uri);
+	// skip syncing jcr_root and /apps /content /conf
+	if(uri.toString().match('[\\|/]jcr_root[\\|/](apps|content|conf)[\\|/]?$') || uri.toString().match('jcr_root[\\|/]?$')) {
+		vscode.window.showErrorMessage('Invalid sync path. Please do not sync root folders.');
 		return;
 	}
 
@@ -104,6 +104,10 @@ function callAEMSync(powershellexe, scriptpath, action, uri, aemserver, aemcreds
 		vscode.window.showErrorMessage('An error occurred. Please see the AEM PowerSync output window.');
 		hasError = true;
 	});
+	child.on('error', (err) => {
+		psoutput.appendLine(err);
+		vscode.window.showErrorMessage('An error occurred. Please see the AEM PowerSync output window.');
+	});
 	child.on('exit',function(){
 		if(hasError) {
 			psoutput.appendLine('aemsync encountered an error');
@@ -120,19 +124,24 @@ function isAEMRunning(callback) {
 	var aemserver = vscode.workspace.getConfiguration('aempowersync').get('uri');
 	var aemhost = aemserver.replace(/http:\/\/(.*?):.*/,'$1');
 	var aemport = Number(aemserver.replace(/http:\/\/.*:(.*)/,'$1'));
+	var aemhealthcheck = vscode.workspace.getConfiguration('aempowersync').get('healthcheck');
 	var options = {
 		host: aemhost,
 		port: aemport,
 		method: 'HEAD',
-		path: vscode.workspace.getConfiguration('aempowersync').get('healthcheck'),
+		path: aemhealthcheck,
 		timeout: 5000
 	};
 	var aemreq = http.request(options, (res) => {
 		// for consistency with handling a null healthcheck, moved logic to event.close
 	}).on('close', () => {
 		if(aemreq.res != null && aemreq.res.statusCode != null) {
-			psoutput.appendLine('Healthcheck: ' + aemreq.res.statusCode);
-			callback(true);
+			psoutput.appendLine('Healthcheck: ' + aemreq.res.statusCode + ' HEAD ' + aemserver + aemhealthcheck);
+			if(aemreq.res.statusCode >= 200 && aemreq.res.statusCode < 500) {
+				callback(true);
+			}else {
+				callback(false);
+			}
 		}else {
 			psoutput.appendLine('Healthcheck: null');
 			callback(false);

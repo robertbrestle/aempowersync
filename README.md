@@ -39,7 +39,7 @@ In [configMgr](http://localhost:4502/system/console/configMgr)
 - [Apache Sling Referrer Filter](http://localhost:4502/system/console/configMgr/org.apache.sling.security.impl.ReferrerFilter) => Enable allow empty, Remove POST
 - [Adobe Granite CSRF Filter](http://localhost:4502/system/console/configMgr/com.adobe.granite.csrf.impl.CSRFFilter) => remove POST
 
-**If you do not update these configurations, the script will delete folders/files from your filesystem**
+**If you do not update these configurations, the script may delete folders/files from your filesystem**
 
 ### Unblock PowerShell Script [Conditional]
 This extension uses a PowerShell script to manage AEM packages and code on your filesystem.  
@@ -62,7 +62,7 @@ Per Microsoft, I encourage you to read the contents of the script before unblock
     - default = `admin:admin`
 - aempowersync.healthcheck
     - AEM healthcheck endpoint as url path
-    - default = `/crx/de/index.jsp`
+    - default = `/libs/granite/core/content/login.html`
 
 ## Known Issues
 - Syncing `.content.xml` files **to AEM** does not work; you must sync the parent folder

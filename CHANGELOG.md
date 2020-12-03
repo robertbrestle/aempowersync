@@ -5,6 +5,15 @@ All notable changes to the "aempowersync" extension will be documented in this f
 
 ## [Unreleased]
 
+## [0.1.9] - 2020-12-03
+### Added
+- support for syncing `/content/*` and `/conf/*`
+- output window spooling of severe PowerShell script errors
+### Changed
+- default healthcheck path to `/libs/granite/core/content/login.html`
+- spool full healthcheck result to output window
+- return more errors from the PowerShell script to the output window
+
 ## [0.1.8] - 2020-10-22
 ### Added
 - extension configuration for PowerShell executable: `aempowersync.powershell`

@@ -22,7 +22,7 @@ param(
 
 # if script is run from the terminal, exit
 if($INPUTFILE -eq "undefined") {
-	echo "No path specified. Exiting."
+	echo "Error: no path specified. Exiting."
 	exit
 }
 
@@ -105,8 +105,9 @@ function copy_here() {
 			#$COPYITEM=($COPYITEM,"/*" -Join "")
 			Copy-Item $COPYITEM -Destination $INPUTFILE -Force -Recurse
 		}else {
-			echo "Missing content folder from package!"
-			echo $INPUTFILE
+			echo "Error: missing content from package. Skipping local file copy."
+			echo "$COPYITEM contains no content"
+			echo "Skipping content copy to $INPUTFILE"
 		}
 	}else {
 		if(Test-Path $COPYITEM) {
