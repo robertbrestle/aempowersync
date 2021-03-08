@@ -13,25 +13,12 @@ Sync options at the bottom of the Explorer window context menu:
 Please follow all configuration steps before attempting to use this extension.  
 
 ### Software Dependencies
-- [7z](https://www.7-zip.org/a/7z1900-x64.msi)
 - [PowerShell 6+](https://github.com/PowerShell/PowerShell/releases)
-
-### Set PATH variable for 7z
-Get `7z` to work from your command line
-- Install 7z from the link above
-- Edit environment variables:
-    - press **Windows Key** + **R**
-    - enter `SystemPropertiesAdvanced`
-    - click **Environment Variables...**
-    - under **System variables** select **Path** and click **Edit...**
-    - click **New** and enter the path to your 7z binaries
-        - `c:\Program Files\7-Zip\`
-- Click **OK** for all the open dialogues
-- Open a new **cmd terminal** and enter `7z`
-    - if the command is recognized, you should see a list of commands
-    - you're **done!**
-  
-[More information on environment variables here.](https://support.microsoft.com/en-us/help/310519/how-to-manage-environment-variables-in-windows-xp)
+- Windows 10 (1903) build 17063 or later
+    - requirement for using `tar` for archive management
+    - if not possible, install 7z
+- [7z](https://www.7-zip.org/a/7z1900-x64.msi) accessible via PATH environment variable \[OPTIONAL\]
+    - [More information on environment variables here.](https://support.microsoft.com/en-us/help/310519/how-to-manage-environment-variables-in-windows-xp)
 
 ### AEM localhost configuration
 For the script to access the AEM APIs, you must update the following configurations.  
@@ -63,10 +50,14 @@ Per Microsoft, I encourage you to read the contents of the script before unblock
 - aempowersync.healthcheck
     - AEM healthcheck endpoint as url path
     - default = `/libs/granite/core/content/login.html`
+- aempowersync.use7z
+    - use 7z to manage local archives
+    - if disabled, the script will attempt to use `tar`
+    - default = `false`
 
 ## Known Issues
 - Syncing `.content.xml` files **to AEM** does not work; you must sync the parent folder
-    - `.content.xml` from AEM = enabled
-    - `.content.xml` to AEM = disabled
-    - `_cq_editConfig.xml` from/to AEM = disabled
-    - `_cq_template/` from/to AEM = disabled
+    - `.content.xml` from AEM = **enabled**
+    - `.content.xml` to AEM = **disabled**
+    - `_cq_editConfig.xml` from/to AEM = **disabled**
+    - `_cq_template/` from/to AEM = **disabled**
