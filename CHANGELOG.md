@@ -5,10 +5,22 @@ All notable changes to the "aempowersync" extension will be documented in this f
 
 ## [Unreleased]
 
+## [0.2.0] - 2021-03-08
+### Added  
+- support for `tar.exe`  
+    - requires Windows 10 (1903) build 17063 or later  
+- extension configuration for toggling the archive manager  
+
+### Changed  
+- allow extension configuration variables to take effect immediately without restart  
+    - excludes PowerShell executable  
+- prioritized sync check over healthcheck  
+
 ## [0.1.9] - 2020-12-03
 ### Added
 - support for syncing `/content/*` and `/conf/*`
-- output window spooling of severe PowerShell script errors
+- output window spooling of severe PowerShell script errors  
+
 ### Changed
 - default healthcheck path to `/libs/granite/core/content/login.html`
 - spool full healthcheck result to output window
@@ -16,7 +28,8 @@ All notable changes to the "aempowersync" extension will be documented in this f
 
 ## [0.1.8] - 2020-10-22
 ### Added
-- extension configuration for PowerShell executable: `aempowersync.powershell`
+- extension configuration for PowerShell executable: `aempowersync.powershell`  
+
 ### Changed
 - removed PATH dependency for PowerShell in README
 
@@ -27,13 +40,15 @@ All notable changes to the "aempowersync" extension will be documented in this f
 ## [0.1.6] - 2020-08-12
 ### Added
 - verify GET package was downloaded
-- bubble up error messages as popup notifications
+- bubble up error messages as popup notifications  
+
 ### Changed
 - updated `cleanup_packages` to test before deleting old packages from the filesystem
 
 ## [0.1.5] - 2020-08-04
 ### Added
-- check + error messages for trying to sync metadata/dialog files and folders
+- check + error messages for trying to sync metadata/dialog files and folders  
+
 ### Changed
 - refactored `Sync to AEM` local package construction
 - README
@@ -41,7 +56,8 @@ All notable changes to the "aempowersync" extension will be documented in this f
 ## [0.1.4] - 2020-08-02
 ### Changed
 - README with more explicit setup instructions
-- changelog formatting
+- changelog formatting  
+
 ### Fixed
 - removed leftover comments that disabled script execution
 - updated healthcheck to be more consistent
@@ -50,7 +66,8 @@ All notable changes to the "aempowersync" extension will be documented in this f
 ### Added
 - configuration parameters for the AEM server
 - pass of AEM credentials to powershell
-- catch for null healthcheck
+- catch for null healthcheck  
+
 ### Changed
 - README
 
@@ -64,7 +81,8 @@ All notable changes to the "aempowersync" extension will be documented in this f
 ### Added
 - protection against syncing `/jcr_root` and `/apps`
 - protection against multiple sync operations
-- check if local AEM server is running before issuing commands
+- check if local AEM server is running before issuing commands  
+
 ### Changed
 - project name
 

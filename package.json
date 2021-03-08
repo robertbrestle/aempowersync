@@ -34,7 +34,7 @@
 				"aempowersync.powershell": {
 					"type": "string",
 					"default": "C:\\\\Program Files\\\\PowerShell\\\\6\\\\pwsh.exe",
-					"description": "PowerShell executable location"
+					"description": "PowerShell executable location (requires vscode restart)"
 				},
 				"aempowersync.uri": {
 					"type": "string",
@@ -50,6 +50,11 @@
 					"type": "string",
 					"default": "/libs/granite/core/content/login.html",
 					"description": "AEM healthcheck path"
+				},
+				"aempowersync.use7z": {
+					"type": "boolean",
+					"default": false,
+					"description": "Use 7z for managing packages"
 				}
 			}
 		},

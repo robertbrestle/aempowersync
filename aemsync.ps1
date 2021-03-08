@@ -2,7 +2,7 @@
 
 # Run with PS 6.1+
 #   Required for Invoke-RestMethod "-Form" parameter
-# Requires PATH variable for 7z
+#   Requires either native tar.exe OR 7z installed + set in PATH environment variable
 
 # localhost:4502/system/console/configMgr
 #  Apache Sling Referrer Filter => Enable allow empty, Remove POST
@@ -17,8 +17,17 @@ param(
 	[Parameter(Mandatory=$True)]
 	[String] $AEMSERVER,
 	[Parameter(Mandatory=$True)]
-	[String] $AEMCREDS
+	[String] $AEMCREDS,
+	[Parameter(Mandatory=$True)]
+	[String] $USE7ZPARAM
 )
+
+try {
+	$USE7Z = [System.Convert]::ToBoolean($USE7ZPARAM)
+}catch [FormatException] {
+	echo "Invalid use7z parameter. Defaulting to False."
+	$USE7Z = $false
+}
 
 # if script is run from the terminal, exit
 if($INPUTFILE -eq "undefined") {
@@ -83,7 +92,12 @@ function zip_package() {
 	if(Test-Path $TMPPKG) {
 		Remove-Item -Force $TMPPKG
 	}
-	7z a -sdel $TMPPKG ./$TMPPKGFOLDER/jcr_root ./$TMPPKGFOLDER/META-INF -xr!$TMPPKGFOLDER | Out-Null
+	if($USE7Z) {
+		echo "Using 7z for package creation"
+		7z a -sdel $TMPPKG ./$TMPPKGFOLDER/jcr_root ./$TMPPKGFOLDER/META-INF -xr!$TMPPKGFOLDER | Out-Null
+	}else {
+		tar -C $TMPPKGFOLDER -acf $TMPPKG jcr_root META-INF
+	}
 }
 
 function unzip_package() {
@@ -91,7 +105,13 @@ function unzip_package() {
 	if(Test-Path $TMPPKGFOLDER) {
 		Remove-Item -Force -Recurse $TMPPKGFOLDER
 	}
-	7z x $TMPPKG -o"$TMPPKGFOLDER" | Out-Null
+	if($USE7Z) {
+		echo "Using 7z for package extraction"
+		7z x $TMPPKG -o"$TMPPKGFOLDER" | Out-Null
+	}else {
+		New-Item -F $TMPPKGFOLDER -ItemType "directory" | Out-Null
+		tar -C $TMPPKGFOLDER -xf $TMPPKG
+	}
 	Remove-Item -Force $TMPPKG
 }
 

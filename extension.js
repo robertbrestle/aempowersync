@@ -15,40 +15,44 @@ function activate(context) {
 
 	// config
 	var powershellexe = vscode.workspace.getConfiguration('aempowersync').get('powershell');
-	var aemserver = vscode.workspace.getConfiguration('aempowersync').get('uri');
-	var aemcreds = vscode.workspace.getConfiguration('aempowersync').get('credentials');
 
 	psoutput = vscode.window.createOutputChannel('AEM PowerSync');
 	psoutput.appendLine('AEM PowerSync is now active!')
 
 	// register commands
 	context.subscriptions.push(vscode.commands.registerCommand('aempowersync.syncFromAEM', (uri) => {
-		isAEMRunning(function(isUp) {
-			if(isUp) {
-				callAEMSync(powershellexe, aemsyncscriptpath, 'get', uri, aemserver, aemcreds);
-			}else {
-				vscode.window.showErrorMessage('AEM healthcheck failed. Please check your AEM instance and extension configuration settings.');
-			}
-		});
+		if(syncing) {
+			vscode.window.showInformationMessage('Please wait for the current sync to complete before starting a new one.');
+			return;
+		}else {
+			isAEMRunning(function(isUp) {
+				if(isUp) {
+					callAEMSync(powershellexe, aemsyncscriptpath, 'get', uri);
+				}else {
+					vscode.window.showErrorMessage('AEM healthcheck failed. Please check your AEM instance and extension configuration settings.');
+				}
+			});
+		}
 	}));
 	context.subscriptions.push(vscode.commands.registerCommand('aempowersync.syncToAEM', (uri) => {
-		isAEMRunning(function(isUp) {
-			if(isUp) {
-				callAEMSync(powershellexe, aemsyncscriptpath, 'put', uri, aemserver, aemcreds);
-			}else {
-				vscode.window.showErrorMessage('AEM healthcheck failed. Please check your AEM instance and extension configuration settings.');
-			}
-		});
+		if(syncing) {
+			vscode.window.showInformationMessage('Please wait for the current sync to complete before starting a new one.');
+			return;
+		}else {
+			isAEMRunning(function(isUp) {
+				if(isUp) {
+					callAEMSync(powershellexe, aemsyncscriptpath, 'put', uri);
+				}else {
+					vscode.window.showErrorMessage('AEM healthcheck failed. Please check your AEM instance and extension configuration settings.');
+				}
+			});
+		}
 	}));
 }
 exports.activate = activate;
 function deactivate() {}
 
-function callAEMSync(powershellexe, scriptpath, action, uri, aemserver, aemcreds) {
-	if(syncing) {
-		vscode.window.showInformationMessage('Please wait for the current sync to complete before starting a new one.');
-		return;
-	}
+function callAEMSync(powershellexe, scriptpath, action, uri) {
 	if(typeof uri === 'undefined') {
 		vscode.window.showErrorMessage('Please use the context menu options from the Explorer view.');
 		return;
@@ -87,8 +91,9 @@ function callAEMSync(powershellexe, scriptpath, action, uri, aemserver, aemcreds
 		scriptpath,
 		action,
 		uri,
-		aemserver,
-		aemcreds
+		vscode.workspace.getConfiguration('aempowersync').get('uri'),
+		vscode.workspace.getConfiguration('aempowersync').get('credentials'),
+		vscode.workspace.getConfiguration('aempowersync').get('use7z')
 	]);
 	child.stdout.on('data',function(data){
 		var message = (data.toString()).trim();
