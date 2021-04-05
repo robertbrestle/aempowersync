@@ -55,6 +55,11 @@
 					"type": "boolean",
 					"default": false,
 					"description": "Use 7z for managing packages"
+				},
+				"aempowersync.enableOsgiConfig": {
+					"type": "boolean",
+					"default": true,
+					"description": "Automatically modify OSGi configurations to allow this extension to work:\norg.apache.sling.security.impl.ReferrerFilter\ncom.adobe.granite.csrf.impl.CSRFFilter"
 				}
 			}
 		},

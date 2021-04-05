@@ -1,0 +1,12 @@
+{
+    "osgiConfig": [
+        {
+            "path": "/system/console/configMgr/org.apache.sling.security.impl.ReferrerFilter",
+            "data": "apply=true&allow.empty=true&filter.methods=DELETE&propertylist=allow.empty,filter.methods"
+        },
+        {
+            "path": "/system/console/configMgr/com.adobe.granite.csrf.impl.CSRFFilter",
+            "data": "apply=true&filter.methods=DELETE&propertylist=filter.methods"
+        }
+    ]
+}

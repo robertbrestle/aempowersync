@@ -1,8 +1,10 @@
 const vscode = require('vscode');
 const http = require('http');
 const { url } = require('inspector');
+const config = require("./aempowersync.json");
 
 var syncing = false;
+var osgiEnabled = false;
 var psoutput;
 
 /**
@@ -17,7 +19,10 @@ function activate(context) {
 	var powershellexe = vscode.workspace.getConfiguration('aempowersync').get('powershell');
 
 	psoutput = vscode.window.createOutputChannel('AEM PowerSync');
-	psoutput.appendLine('AEM PowerSync is now active!')
+	psoutput.appendLine('AEM PowerSync is now active!');
+
+	var enabledOsgiConfig = vscode.workspace.getConfiguration('aempowersync').get('enableOsgiConfig');
+	osgiEnabled = !enabledOsgiConfig;
 
 	// register commands
 	context.subscriptions.push(vscode.commands.registerCommand('aempowersync.syncFromAEM', (uri) => {
@@ -27,7 +32,16 @@ function activate(context) {
 		}else {
 			isAEMRunning(function(isUp) {
 				if(isUp) {
-					callAEMSync(powershellexe, aemsyncscriptpath, 'get', uri);
+					if(!osgiEnabled) {
+						enableOSGIConfig(function(success) {
+							if(success) {
+								osgiEnabled = true;
+								callAEMSync(powershellexe, aemsyncscriptpath, 'get', uri);
+							}
+						});
+					}else {
+						callAEMSync(powershellexe, aemsyncscriptpath, 'get', uri);
+					}
 				}else {
 					vscode.window.showErrorMessage('AEM healthcheck failed. Please check your AEM instance and extension configuration settings.');
 				}
@@ -41,7 +55,16 @@ function activate(context) {
 		}else {
 			isAEMRunning(function(isUp) {
 				if(isUp) {
-					callAEMSync(powershellexe, aemsyncscriptpath, 'put', uri);
+					if(!osgiEnabled) {
+						enableOSGIConfig(function(success) {
+							if(success) {
+								osgiEnabled = true;
+								callAEMSync(powershellexe, aemsyncscriptpath, 'put', uri);
+							}
+						});
+					}else {
+						callAEMSync(powershellexe, aemsyncscriptpath, 'put', uri);
+					}
 				}else {
 					vscode.window.showErrorMessage('AEM healthcheck failed. Please check your AEM instance and extension configuration settings.');
 				}
@@ -152,6 +175,69 @@ function isAEMRunning(callback) {
 			callback(false);
 		}
 	}).end();
+}
+
+function enableOSGIConfig(callback) {
+	let reqs = 0;
+	config.osgiConfig.forEach(function(c) {
+		updateOSGIComponent(c, function(res) {
+			if(res < 400) {
+				reqs++;
+			}else if(res < 500) {
+				vscode.window.showErrorMessage('Invalid AEM user credentials. Please check your AEM instance and extension configuration settings.');
+			}else {
+				vscode.window.showErrorMessage('Server error. Please check your AEM instance and extension configuration settings.');
+			}
+			if(reqs == config.osgiConfig.length) {
+				psoutput.appendLine("AEM OSGi configuration updated successfully.");
+				callback(true);
+				return;
+			}
+		});
+	});
+	callback(false);
+}
+
+function updateOSGIComponent(osgiJson, callback) {
+	let creds = vscode.workspace.getConfiguration('aempowersync').get('credentials');
+	if(typeof creds === "undefined" || creds == "") {
+		callback(false);
+	}else {
+		var aemserver = vscode.workspace.getConfiguration('aempowersync').get('uri');
+		var aemhost = aemserver.replace(/http:\/\/(.*?):.*/,'$1');
+		var aemport = Number(aemserver.replace(/http:\/\/.*:(.*)/,'$1'));
+		let auth = "Basic " + Buffer.from(creds).toString("base64");
+		let data = osgiJson.data;
+
+		let options = {
+			host: aemhost,
+			port: aemport,
+			path: osgiJson.path,
+			method: "POST",
+			timeout: 5000,
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+				"Authorization": auth,
+				"Content-Length": Buffer.byteLength(data)
+			}
+		};
+
+		try {
+			const aemreq = http.request(options, (res) => {
+				psoutput.appendLine("updateOSGIConfig " + osgiJson.path + " " + res.statusCode);
+				callback(res.statusCode);
+				//res.on("data", (chunk) => {});
+				res.on("close", () => {});
+			});
+			aemreq.on("error", (error) => {
+				psoutput.appendLine("updateOSGIConfig error: " + error);
+			});
+			aemreq.write(data);
+			aemreq.end();
+		}catch(e) {
+			psoutput.appendLine("updateOSGIConfig error: " + e);
+		}
+	}
 }
 
 module.exports = {

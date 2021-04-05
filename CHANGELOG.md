@@ -5,6 +5,14 @@ All notable changes to the "aempowersync" extension will be documented in this f
 
 ## [Unreleased]
 
+## [0.2.1] - 2021-04-05
+### Added  
+- extension configuration for automatically modifying OSGi components to allow the script to access AEM APIs  
+    - property enabled by default  
+    - modify the following OSGi components  
+        - org.apache.sling.security.impl.ReferrerFilter  
+        - com.adobe.granite.csrf.impl.CSRFFilter  
+
 ## [0.2.0] - 2021-03-08
 ### Added  
 - support for `tar.exe`  
