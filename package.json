@@ -3,7 +3,7 @@
 	"displayName": "AEM PowerSync",
 	"description": "Sync files and folders between your local AEM instance and file system.",
 	"publisher": "RobertBrestle",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"preview": true,
 	"repository": {
 		"url": "https://github.com/robertbrestle/aempowersync.git",
