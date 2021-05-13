@@ -5,6 +5,14 @@ All notable changes to the "aempowersync" extension will be documented in this f
 
 ## [Unreleased]
 
+## [0.2.2] - 2021-05-12
+### Added  
+- project license (MIT)  
+- project icon  
+
+### Changed  
+- updated npm packages to patch vulnerabilities
+
 ## [0.2.1] - 2021-04-05
 ### Added  
 - extension configuration for automatically modifying OSGi components to allow the script to access AEM APIs  
