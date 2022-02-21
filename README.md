@@ -3,7 +3,7 @@ AEM PowerSync is an extension for VSCode that allows you to sync files and folde
 
 This tool was only intended for local AEM development and should not be considered for use in production environments due to security vulnerabilities.
 
-## Features
+# Features
 This extension was designed for AEM 6.5 local development on Windows 10.
 
 Sync options at the bottom of the Explorer window context menu:
@@ -11,10 +11,14 @@ Sync options at the bottom of the Explorer window context menu:
 
 **Please, only use this extension for local AEM development.**
 
-## Setup Configuration
+# Extension Compilation
+1. Install the npm package [vsce](https://www.npmjs.com/package/vsce)  
+2. Package with `vsce package`  
+
+# Setup Configuration
 Please follow all configuration steps before attempting to use this extension.  
 
-### Software Dependencies
+## Software Dependencies
 - [PowerShell 6+](https://github.com/PowerShell/PowerShell/releases)
 - Windows 10 (1903) build 17063 or later
     - requirement for using `tar` for archive management
@@ -22,7 +26,7 @@ Please follow all configuration steps before attempting to use this extension.
 - [7z](https://www.7-zip.org/a/7z1900-x64.msi) accessible via PATH environment variable \[OPTIONAL\]
     - [More information on environment variables here.](https://support.microsoft.com/en-us/help/310519/how-to-manage-environment-variables-in-windows-xp)
 
-### AEM OSGi Component Configuration
+## AEM OSGi Component Configuration
 For the script to manage packages, CSRF and referrer filter OSGi configurations will need relaxed permissions. For increased security, ensure your local AEM instance isn't exposed to the public internet.  
 
 By default, this extension will update the below component properties on initial sync.  
@@ -39,7 +43,7 @@ curl -u admin:admin -X POST "http://localhost:4502/system/console/configMgr/com.
 
 **If you do not update these configurations, the script may delete folders/files from your filesystem.**
 
-### Unblock PowerShell Script [Conditional]
+## Unblock PowerShell Script [Conditional]
 This extension uses a PowerShell script to manage AEM packages and code on your filesystem.  
 The script is located at:  
 `%USERPROFILE%\.vscode\extensions\aempowersync-X.X.X\aemsync.ps1`
@@ -48,7 +52,7 @@ Per Microsoft, I encourage you to read the contents of the script before unblock
 [You can read more here](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-7#example-7--unblock-a-script-to-run-it-without-changing-the-execution-policy)  
 
 
-## Extension Settings
+# Extension Settings
 - aempowersync.powershell
     - Location of the PowerShell executable
     - default = `C:\\Program Files\\PowerShell\\6\\pwsh.exe`
@@ -70,9 +74,11 @@ Per Microsoft, I encourage you to read the contents of the script before unblock
     - if enabled, the extension will attempt to update the OSGi components found in aempowersync.json
     - default = `true`
 
-## Known Issues
+# Known Issues
 - Syncing `.content.xml` files **to AEM** does not work; you must sync the parent folder
     - `.content.xml` from AEM = **enabled**
     - `.content.xml` to AEM = **disabled**
     - `_cq_editConfig.xml` from/to AEM = **disabled**
     - `_cq_template/` from/to AEM = **disabled**
+
+&nbsp;

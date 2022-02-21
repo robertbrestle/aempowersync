@@ -5,6 +5,13 @@ All notable changes to the "aempowersync" extension will be documented in this f
 
 ## [Unreleased]
 
+## [0.2.3] - 2022-02-21
+### Added  
+- README instructions for compiling
+
+### Changed  
+- updated npm packages to patch vulnerabilities
+
 ## [0.2.2] - 2021-05-12
 ### Added  
 - project license (MIT)  
