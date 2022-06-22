@@ -67,24 +67,31 @@ if((Get-Item $INPUTFILE) -is [System.IO.DirectoryInfo]) {
 #############################################################################
 
 function create_base_package() {
-	# delete old package artifacts
-	if(Test-Path jcr_root) {
-		Remove-Item -Force -Recurse jcr_root
+	try {
+		# delete old package artifacts
+		if(Test-Path jcr_root) {
+			Remove-Item -Force -Recurse jcr_root
+		}
+		if(Test-Path META-INF) {
+			Remove-Item -Force -Recurse META-INF
+		}
+		
+		# create folders
+		New-Item -F $TMPPKGFOLDER/META-INF/vault -ItemType "directory" | Out-Null
+		New-Item -F $TMPPKGFOLDER/jcr_root -ItemType "directory" | Out-Null
+		
+		$FILTER = "<?xml version=""1.0"" encoding=""UTF-8""?><workspaceFilter version=""1.0""><filter root=""", $AEMFILE, """/></workspaceFilter>" -Join ""
+		
+		$PROPERTIES = "<?xml version=""1.0"" encoding=""UTF-8"" standalone=""no""?><!DOCTYPE properties SYSTEM ""http://java.sun.com/dtd/properties.dtd""><properties><entry key=""name"">aempowersync</entry><entry key=""version"">1.0.0</entry><entry key=""group"">aempowersync</entry></properties>"
+		
+		Add-Content -Path $TMPPKGFOLDER/META-INF/vault/filter.xml -Value $FILTER
+		Add-Content -Path $TMPPKGFOLDER/META-INF/vault/properties.xml -Value $PROPERTIES
+
+		return $true
+	}catch {
+		echo "Error: issues creating base package. Try re-launching VSCode as an Administrator."
 	}
-	if(Test-Path META-INF) {
-		Remove-Item -Force -Recurse META-INF
-	}
-	
-	# create folders
-	New-Item -F $TMPPKGFOLDER/META-INF/vault -ItemType "directory" | Out-Null
-	New-Item -F $TMPPKGFOLDER/jcr_root -ItemType "directory" | Out-Null
-	
-	$FILTER = "<?xml version=""1.0"" encoding=""UTF-8""?><workspaceFilter version=""1.0""><filter root=""", $AEMFILE, """/></workspaceFilter>" -Join ""
-	
-	$PROPERTIES = "<?xml version=""1.0"" encoding=""UTF-8"" standalone=""no""?><!DOCTYPE properties SYSTEM ""http://java.sun.com/dtd/properties.dtd""><properties><entry key=""name"">aempowersync</entry><entry key=""version"">1.0.0</entry><entry key=""group"">aempowersync</entry></properties>"
-	
-	Add-Content -Path $TMPPKGFOLDER/META-INF/vault/filter.xml -Value $FILTER
-	Add-Content -Path $TMPPKGFOLDER/META-INF/vault/properties.xml -Value $PROPERTIES
+	return $false
 }
 
 function zip_package() {
@@ -241,22 +248,24 @@ switch($ACTION)
 {
 	"get" {
 		echo ("GET ",$AEMFILE -Join "")
-		create_base_package
-		zip_package
-		upload_pkg
-		build_pkg
-		download_pkg
-		unzip_package
-		copy_here
+		if(create_base_package) {
+			zip_package
+			upload_pkg
+			build_pkg
+			download_pkg
+			unzip_package
+			copy_here
+		}
 	}
 	"put" {
 		echo ("PUT ",$AEMFILE -Join "")
 		# copy fresh structure from AEM instance
-		create_base_package
-		copy_local
-		zip_package
-		upload_pkg
-		install_pkg
+		if(create_base_package) {
+			copy_local
+			zip_package
+			upload_pkg
+			install_pkg
+		}
 	}
 	default {
 		echo "invalid action"

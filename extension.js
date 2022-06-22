@@ -12,17 +12,43 @@ var psoutput;
  */
 function activate(context) {
 
+	// disable activation option from explorer context menu
+	vscode.commands.executeCommand('setContext', 'disableAEMPowerSync', true);
+	// if enabled, show the "Sync from AEM" explorer context menu option
+	if(vscode.workspace.getConfiguration('aempowersync').get('enableSyncFrom')) {
+		vscode.commands.executeCommand('setContext', 'enableSyncFrom', true);
+	}
+	// if enabled, show the "Sync to AEM" explorer context menu option
+	if(vscode.workspace.getConfiguration('aempowersync').get('enableSyncTo')) {
+		vscode.commands.executeCommand('setContext', 'enableSyncTo', true);
+	}
+
 	// reference script from extensions folder
 	var aemsyncscriptpath = context.extensionPath + '\\aemsync.ps1';
 
 	// config
 	var powershellexe = vscode.workspace.getConfiguration('aempowersync').get('powershell');
 
+	// create output channel
 	psoutput = vscode.window.createOutputChannel('AEM PowerSync');
-	psoutput.appendLine('AEM PowerSync is now active!');
 
 	var enabledOsgiConfig = vscode.workspace.getConfiguration('aempowersync').get('enableOsgiConfig');
 	osgiEnabled = !enabledOsgiConfig;
+
+	// enable OSGI configuration
+	isAEMRunning(function(isUp) {
+		if(isUp) {
+			if(!osgiEnabled) {
+				enableOSGIConfig(function(success) {
+					if(success) {
+						osgiEnabled = true;
+					}
+				});
+			}
+		}else {
+			vscode.window.showErrorMessage('AEM healthcheck failed. Please check your AEM instance and extension configuration settings.');
+		}
+	});
 
 	// register commands
 	context.subscriptions.push(vscode.commands.registerCommand('aempowersync.syncFromAEM', (uri) => {
@@ -32,16 +58,7 @@ function activate(context) {
 		}else {
 			isAEMRunning(function(isUp) {
 				if(isUp) {
-					if(!osgiEnabled) {
-						enableOSGIConfig(function(success) {
-							if(success) {
-								osgiEnabled = true;
-								callAEMSync(powershellexe, aemsyncscriptpath, 'get', uri);
-							}
-						});
-					}else {
-						callAEMSync(powershellexe, aemsyncscriptpath, 'get', uri);
-					}
+					callAEMSync(powershellexe, aemsyncscriptpath, 'get', uri);
 				}else {
 					vscode.window.showErrorMessage('AEM healthcheck failed. Please check your AEM instance and extension configuration settings.');
 				}
@@ -55,23 +72,17 @@ function activate(context) {
 		}else {
 			isAEMRunning(function(isUp) {
 				if(isUp) {
-					if(!osgiEnabled) {
-						enableOSGIConfig(function(success) {
-							if(success) {
-								osgiEnabled = true;
-								callAEMSync(powershellexe, aemsyncscriptpath, 'put', uri);
-							}
-						});
-					}else {
-						callAEMSync(powershellexe, aemsyncscriptpath, 'put', uri);
-					}
+					callAEMSync(powershellexe, aemsyncscriptpath, 'put', uri);
 				}else {
 					vscode.window.showErrorMessage('AEM healthcheck failed. Please check your AEM instance and extension configuration settings.');
 				}
 			});
 		}
 	}));
-}
+
+	psoutput.appendLine('AEM PowerSync is now active!');
+	vscode.window.showInformationMessage('AEM PowerSync is now active!');
+}//activate
 exports.activate = activate;
 function deactivate() {}
 
@@ -185,8 +196,12 @@ function enableOSGIConfig(callback) {
 				reqs++;
 			}else if(res < 500) {
 				vscode.window.showErrorMessage('Invalid AEM user credentials. Please check your AEM instance and extension configuration settings.');
+				callback(false);
+				return;
 			}else {
 				vscode.window.showErrorMessage('Server error. Please check your AEM instance and extension configuration settings.');
+				callback(false);
+				return;
 			}
 			if(reqs == config.osgiConfig.length) {
 				psoutput.appendLine("AEM OSGi configuration updated successfully.");
@@ -195,7 +210,6 @@ function enableOSGIConfig(callback) {
 			}
 		});
 	});
-	callback(false);
 }
 
 function updateOSGIComponent(osgiJson, callback) {

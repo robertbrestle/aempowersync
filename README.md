@@ -15,11 +15,14 @@ Sync options at the bottom of the Explorer window context menu:
 1. Install the npm package [vsce](https://www.npmjs.com/package/vsce)  
 2. Package with `vsce package`  
 
+[Extension Manifest](https://code.visualstudio.com/api/references/extension-manifest)
+
 # Setup Configuration
 Please follow all configuration steps before attempting to use this extension.  
 
 ## Software Dependencies
-- [PowerShell 6+](https://github.com/PowerShell/PowerShell/releases)
+- [PowerShell 7](https://github.com/PowerShell/PowerShell/releases)
+    - Compatible with PowerShell 6
 - Windows 10 (1903) build 17063 or later
     - requirement for using `tar` for archive management
     - if not possible, install 7z
@@ -51,6 +54,8 @@ The script is located at:
 Per Microsoft, I encourage you to read the contents of the script before unblocking the file or changing your execution policy.  
 [You can read more here](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-executionpolicy?view=powershell-7#example-7--unblock-a-script-to-run-it-without-changing-the-execution-policy)  
 
+Alternatively, you can try running VSCode as an Administrator to resolve script permission issues.
+
 
 # Extension Settings
 - aempowersync.powershell
@@ -72,6 +77,12 @@ Per Microsoft, I encourage you to read the contents of the script before unblock
 - aempowersync.enableOsgiConfig
     - automatically enable OSGi components for access to the AEM API
     - if enabled, the extension will attempt to update the OSGi components found in aempowersync.json
+    - default = `true`
+- aempowersync.enableSyncFrom
+    - enable the "Sync from AEM" explorer menu option
+    - default = `true`
+- aempowersync.enableSyncTo
+    - enable the "Sync from To" explorer menu option
     - default = `true`
 
 # Known Issues

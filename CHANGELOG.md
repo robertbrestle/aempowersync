@@ -5,6 +5,28 @@ All notable changes to the "aempowersync" extension will be documented in this f
 
 ## [Unreleased]
 
+## [0.2.4] - 2022-06-22
+### Added
+- `Enable AEM PowerSync extension` explorer context menu option  
+    - shows on vscode startup  
+    - required to enable AEM PowerSync  
+- configuration to toggle explorer context menu options  
+    - `Enable the "Sync from AEM" explorer menu option`  
+    - `Enable the "Sync to AEM" explorer menu option`  
+    - if an option is disabled, it will not be present in the context menu  
+
+### Changed
+- updated npm packages to patch vulnerabilities  
+- default to PowerShell 7  
+- moved enable OSGi to run on activate instead of the get/put commands  
+    - the AEM healthcheck is still called before executing any command  
+
+### Fixed
+- callback race condition in `enableOSGIConfig()` in extension.js  
+- added try-catch to `create_base_package()` in aemsync.ps1  
+    - returns success boolean used to determine if all additional functions should be called  
+    - prevents stack trace spam in output  
+
 ## [0.2.3] - 2022-02-21
 ### Added  
 - README instructions for compiling
