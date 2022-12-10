@@ -5,6 +5,10 @@ All notable changes to the "aempowersync" extension will be documented in this f
 
 ## [Unreleased]
 
+## [0.2.5] - 2022-12-10
+### Changed
+- updated npm packages to patch vulnerabilities  
+
 ## [0.2.4] - 2022-06-22
 ### Added
 - `Enable AEM PowerSync extension` explorer context menu option  
